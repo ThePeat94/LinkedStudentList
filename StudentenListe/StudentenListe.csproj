@@ -44,9 +44,11 @@
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="src\DoubleLinkedList.cs" />
+    <Compile Include="src\DoubleLinkedStudentNode.cs" />
     <Compile Include="src\LinkedList.cs" />
     <Compile Include="src\Student.cs" />
-    <Compile Include="src\StudentNode.cs" />
+    <Compile Include="src\LinkedStudentNode.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

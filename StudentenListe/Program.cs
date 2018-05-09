@@ -133,11 +133,18 @@ namespace StudentenListe
 
         static void Main(string[] args)
         {
+            GenerateRandomList();
+
+            Console.ReadKey();
+        }
+
+        private static void GenerateRandomList()
+        {
             LinkedList linkedList = new LinkedList();
             Random rnd = new Random();
             //int id = rnd.Next(73628, 78329);
             int id = 0;
-            for(int i = 0; i <= rnd.Next(10, 101); i++)
+            for (int i = 0; i <= rnd.Next(10, 101); i++)
             {
                 id = rnd.Next(73628, 78329);
                 string vorname = vornamen[rnd.Next(0, vornamen.Count)];
@@ -145,7 +152,7 @@ namespace StudentenListe
                 string studiengang = studiengaenge[rnd.Next(0, studiengaenge.Count)];
 
                 Student neuerStudent = new Student(nachname, vorname, id, studiengang);
-                StudentNode sn = new StudentNode(neuerStudent);
+                LinkedStudentNode sn = new LinkedStudentNode(neuerStudent);
 
                 if (i == 0)
                 {
@@ -165,13 +172,9 @@ namespace StudentenListe
 
                 //id++;
             }
-            linkedList.DeleteAt(5);
-            linkedList.SelectionSortList();
+
             linkedList.OutputAll();
-
-            Console.ReadKey();
+            Console.WriteLine("------------------------------");
         }
-
-
     }
 }

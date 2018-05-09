@@ -9,12 +9,25 @@ namespace StudentenListe.src
 {
     class LinkedList
     {
-        private StudentNode head;
+
+        public enum SortMode { MATRIKELNUMMER, STUDIENGANG }
+
+        public enum SortOrder { ASCENDING, DESCENDING }
+
+        public enum SearchMode { VORNAME, NACHNAME, VORUNDNACHNAME, MATRIKELNUMMER, STUDIENGANG }
+
+        public int Count
+        {
+            get { return count; }
+            private set { count = value; }
+        }
+        private LinkedStudentNode head;
         private int count = 0;
 
-        public LinkedList(StudentNode head)
+        public LinkedList(LinkedStudentNode head)
         {
             this.head = head;
+            count++;
         }
 
         public LinkedList()
@@ -22,29 +35,35 @@ namespace StudentenListe.src
             
         }
 
-        public bool AddLast(StudentNode neuesElement)
+        public bool AddLast(LinkedStudentNode neuesElement)
         {
-            if (head != null)
+            try
             {
-                if (head.AddNachfolger(neuesElement))
+                if (head != null)
                 {
+                    LinkedStudentNode current = head;
+
+                    while (current.Nachfolger != null)
+                    {
+                        current = current.Nachfolger;
+                    }
+
+                    current.Nachfolger = neuesElement;
                     count++;
                     return true;
                 }
-                else
-                {
-                    return false;
-                }
-            }
-            else
-            {
                 head = neuesElement;
                 count++;
                 return true;
             }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                return false;
+            }
         }
 
-        public bool AddFirst(StudentNode toAdd)
+        public bool AddFirst(LinkedStudentNode toAdd)
         {
             try
             {
@@ -53,12 +72,6 @@ namespace StudentenListe.src
                     head = toAdd;
                     count++;
                     return true;
-                }
-
-
-                if (head.Student.Matrikelnummer == toAdd.Student.Matrikelnummer)
-                {
-                    return false;
                 }
 
                 toAdd.Nachfolger = head;
@@ -74,11 +87,11 @@ namespace StudentenListe.src
 
         }
 
-        public StudentNode ElementAt(int index)
+        public LinkedStudentNode ElementAt(int index)
         {
             if (ValidityCheck(index))
             {
-                StudentNode current = head;
+                LinkedStudentNode current = head;
                 for (int i = 1; i <= index; i++)
                 {
                     current = current.Nachfolger;
@@ -93,8 +106,7 @@ namespace StudentenListe.src
         {
             if (ValidityCheck())
             {
-                StudentNode current;
-                current = head;
+                LinkedStudentNode current = head;
                 Console.WriteLine(current.Student.ToString());
 
                 // Solange ein Nachfolger existiert, gibt es noch einen Studenten zur Darstellung
@@ -121,18 +133,16 @@ namespace StudentenListe.src
                         return true;
                     }
 
-                    StudentNode toDelete = ElementAt(index);
-                    StudentNode predecessor = ElementAt(index - 1);
+                    LinkedStudentNode toDelete = ElementAt(index);
+                    LinkedStudentNode predecessor = ElementAt(index - 1);
 
                     predecessor.Nachfolger = toDelete.Nachfolger;
                     count--;
                     return true;
 
                 }
-                else
-                {
-                    return false;
-                }
+                return false;
+                
             }
             catch (Exception e)
             {
@@ -149,10 +159,7 @@ namespace StudentenListe.src
                 count = 0;
                 return true;
             }
-            else
-            {
-                return false;
-            }
+            return false;
         }
 
         public void OutputCount()
@@ -160,38 +167,54 @@ namespace StudentenListe.src
             Console.WriteLine(String.Format("Anzahl Elemente in der Liste: {0}", count));
         }
 
-        public Student SearchForStudent(int matrikelnummer, string studiengang)
+        /// <summary>
+        /// Sucht nach Studenten
+        /// </summary>
+        /// <param name="searchMode">Das Kriterium, nach welchem gesucht werden soll.</param>
+        /// <param name="suchparameter">Die Werte, nach denen gefiltert werden sollen. (Soll nach Vor- und Nachname gesucht werden, so steht der Vorname an erster, der Nachname an zweiter Stelle)</param>
+        /// <returns></returns>
+        public List<Student> SearchForStudent(SearchMode searchMode, params string[] suchparameter)
         {
             if (ValidityCheck())
             {
-                StudentNode current = head;
+                if (suchparameter.Length == 0)
+                    return null;
 
-                do
-                {
-                    if (current.Student.Matrikelnummer == matrikelnummer && current.Student.Studiengang == studiengang)
-                    {
-                        return current.Student;
-                    }
-                    current = current.Nachfolger;
-                } while (current != null); // Ist null, wenn es keinen Nachfolger mehr gibt
-            }
-
-            return null;
-        }
-
-        public List<Student> SearchForStudent(string vorname, string nachname)
-        {
-            if (ValidityCheck())
-            {
                 List<Student> result = new List<Student>();
-                StudentNode current = head;
+                LinkedStudentNode current = head;
 
                 do
                 {
-                    if (current.Student.Vorname == vorname && current.Student.Nachname == nachname)
+                    Student toAdd = null;
+                    if (searchMode == SearchMode.VORNAME && current.Student.Vorname == suchparameter[0])
                     {
-                        result.Add(current.Student);
+                        toAdd = current.Student;
                     }
+                    else if (searchMode == SearchMode.NACHNAME && current.Student.Nachname == suchparameter[0])
+                    {
+                        toAdd = current.Student;
+                    }
+                    else if (searchMode == SearchMode.VORUNDNACHNAME && current.Student.Vorname == suchparameter[0] && current.Student.Nachname == suchparameter[1])
+                    {
+                        toAdd = current.Student;
+                    }
+                    else if (searchMode == SearchMode.MATRIKELNUMMER && current.Student.Matrikelnummer == Int32.Parse(suchparameter[0]))
+                    {
+                        // Wenn nach der Matrikelnummer gesucht wird, so wird nur ein Eintrag existieren
+                        // Diesen der Liste hinzufügen und zurückgeben
+                        result.Add(current.Student);
+                        return result;
+                    }
+                    else if (searchMode == SearchMode.STUDIENGANG && current.Student.Studiengang == suchparameter[0])
+                    {
+                        toAdd = current.Student;
+                    }
+
+                    if (toAdd != null)
+                    {
+                        result.Add(toAdd);
+                    }
+
                     current = current.Nachfolger;
                 } while (current != null); // Ist null, wenn es keinen Nachfolger mehr gibt
 
@@ -201,30 +224,80 @@ namespace StudentenListe.src
             return null;
         }
 
-        public void SelectionSortList()
+        public void SelectionSortList(SortMode sortMode)
         {
             if (ValidityCheck())
             {
-                StudentNode current = head;
-                do
+                for (int i = 0; i < count; i++)
                 {
-                    StudentNode next = current.Nachfolger;
-                    while(next != null)
-                    {
-                        if (current.Student.Matrikelnummer > next.Student.Matrikelnummer)
-                        {
-                            Student toSwap = next.Student;
-                            next.Student = current.Student;
-                            current.Student = toSwap;
-                            break;
-                        }
-                        next = next.Nachfolger;
-                    }
 
-                    current = current.Nachfolger;
-                } while (current != null);
+                    int currMin = i;
+                    for (int j = i + 1; j < count; j++)
+                    {
+                        LinkedStudentNode minElement = ElementAt(currMin);
+                        LinkedStudentNode jElement = ElementAt(j);
+
+                        if (sortMode == SortMode.MATRIKELNUMMER)
+                        {
+                            // Wenn das Element an der aktuellen kleinsten Stelle größer ist als das jElement, so ist jElement das kleinste Element
+                            if (minElement.Student.Matrikelnummer > jElement.Student.Matrikelnummer)
+                            {
+                                currMin = j;
+                            }
+                        }
+
+                        if (sortMode == SortMode.STUDIENGANG)
+                        {
+                            // Wenn das Element an der aktuellen kleinsten Stelle größer ist als das jElement, so ist jElement das kleinste Element
+                            if (String.Compare(minElement.Student.Studiengang, jElement.Student.Studiengang, StringComparison.OrdinalIgnoreCase) > 0)
+                            {
+                                currMin = j;
+                            }
+                        }
+
+                    }
+                    Student toSwap = ElementAt(currMin).Student;
+                    ElementAt(currMin).Student = ElementAt(i).Student;
+                    ElementAt(i).Student = toSwap;
+                }
             }
         }
+
+        public void InsertionSort(SortMode sortMode)
+        {
+            // Erste Element ist bereits sortiert ("Linker Teil")
+            for (int i = 1; i < count; i++)
+            {
+                Student einzusortierendeElement = ElementAt(i).Student;
+                int idLinks = i;
+
+                // Von rechts nach links laufen und alle größeren Elemente nach rechts verschieben
+                if (sortMode == SortMode.MATRIKELNUMMER)
+                {
+                    while (idLinks > 0 && einzusortierendeElement.Matrikelnummer < ElementAt(idLinks - 1).Student.Matrikelnummer)
+                    {
+                        // Das Element links einen nach rechts verschieben
+                        ElementAt(idLinks).Student = ElementAt(idLinks - 1).Student;
+                        idLinks--;
+                    }
+                }
+                else if (sortMode == SortMode.STUDIENGANG)
+                {
+                    while (idLinks > 0 && String.Compare(einzusortierendeElement.Studiengang, ElementAt(idLinks - 1).Student.Studiengang, StringComparison.OrdinalIgnoreCase) < 0)
+                    {
+                        // Das Element links einen nach rechts verschieben
+                        ElementAt(idLinks).Student = ElementAt(idLinks - 1).Student;
+                        idLinks--;
+                    }
+                }
+
+
+                // Nach der while-Schleife wissen wir, wo unser aktuelles Element eingeordnet werden muss
+                ElementAt(idLinks).Student = einzusortierendeElement;
+
+            }
+        }
+           
 
         private bool ValidityCheck()
         {
