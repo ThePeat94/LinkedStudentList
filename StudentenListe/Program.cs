@@ -131,11 +131,16 @@ namespace StudentenListe
             "Geschichte"
         };
 
+        private static LinkedList studentLinkedList;
+
         static void Main(string[] args)
         {
-            GenerateRandomList();
-
-            Console.ReadKey();
+            Console.WriteLine("Sie haben das Studentenlistenprogramm gestartet.");
+            bool continueProgram = true;
+            while (continueProgram)
+            {
+                continueProgram = mainmenu();
+            }
         }
 
         private static void GenerateRandomList()
@@ -175,6 +180,82 @@ namespace StudentenListe
 
             linkedList.OutputAll();
             Console.WriteLine("------------------------------");
+        }
+
+        private static bool mainmenu()
+        {
+            Console.WriteLine("Programmauswahl: ");
+            Console.WriteLine("(0) Programm beenden");
+            Console.WriteLine("(1) Studenten hinzufügen");
+
+            if (studentLinkedList == null)
+            {
+                studentLinkedList = new LinkedList();
+            }
+
+            if(studentLinkedList.Count > 0)
+            {
+                Console.WriteLine("(2) Studenten löschen");
+                Console.WriteLine("(3) Studenten suchen");
+                Console.WriteLine("(4) Liste sortieren");
+                Console.WriteLine("(5) Liste ausgeben");
+                Console.WriteLine("(6) Liste löschen");
+                Console.WriteLine("(7) Anzahl Elemente ausgeben");
+            }
+
+            int operation = Int32.Parse(Console.ReadLine());
+
+            if (operation == 0)
+                return false;
+            if (operation == 1)
+                AddStudentToList();
+
+            if (studentLinkedList.Count > 0)
+            { 
+                if(operation == 5)
+                    studentLinkedList.OutputAll();
+            }
+
+            return true;
+        }
+
+        private static void AddStudentToList()
+        {
+            Console.WriteLine("Sie wollen einen Studenten hinzufügen. Ein Student besteht aus Vorname, Nachname, Matrikelnummer und dem Studiengang.");
+            Console.WriteLine("Vorname: ");
+            string vorname = Console.ReadLine();
+
+            Console.WriteLine("Nachname: ");
+            string nachname = Console.ReadLine();
+
+            Console.WriteLine("Matrikelnummer: ");
+            string matrikelnummer = Console.ReadLine();
+
+            Console.WriteLine("Studiengang: ");
+            string studiengang = Console.ReadLine();
+
+            Student neuerStudent = new Student(nachname, vorname, Int32.Parse(matrikelnummer), studiengang);
+
+            Console.WriteLine("Wollen Sie den Studenten am Anfang oder am Ende hinzufügen?");
+            Console.WriteLine("(1) Anfang, (2) Ende");
+            int operation = Int32.Parse(Console.ReadLine());
+
+            if (operation == 1)
+            {
+                if (!studentLinkedList.AddFirst(new LinkedStudentNode(neuerStudent)))
+                {
+                    Console.WriteLine("Fehler beim Hinzufügen des Studenten.");
+                }
+            }
+            else if (operation == 2)
+            {
+                if (!studentLinkedList.AddLast(new LinkedStudentNode(neuerStudent)))
+                {
+                    Console.WriteLine("Fehler beim Hinzufügen des Studenten.");
+                }
+            }
+
+
         }
     }
 }
