@@ -102,18 +102,21 @@ namespace StudentenListe.src
             return null;
         }
 
-        public void OutputAll()
+        public void OutputAll(bool showIndex)
         {
             if (ValidityCheck())
             {
                 LinkedStudentNode current = head;
-                Console.WriteLine(current.Student.ToString());
-
+                int index = 0;
                 // Solange ein Nachfolger existiert, gibt es noch einen Studenten zur Darstellung
-                while (current.Nachfolger != null)
+                while (current != null)
                 {
+                    if(showIndex)
+                        Console.WriteLine(String.Format("[{0}]: {1}", index, current.Student));
+                    else
+                        Console.WriteLine(String.Format("{1}", current.Student));
                     current = current.Nachfolger;
-                    Console.WriteLine(current.Student.ToString());
+                    index++;
                 }
             }
         }

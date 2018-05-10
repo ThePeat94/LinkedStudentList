@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using StudentenListe.src;
@@ -135,21 +136,32 @@ namespace StudentenListe
 
         static void Main(string[] args)
         {
-            Console.WriteLine("Sie haben das Studentenlistenprogramm gestartet.");
-            bool continueProgram = true;
-            while (continueProgram)
+            try
             {
-                continueProgram = mainmenu();
+                Console.WriteLine("Sie haben das Studentenlistenprogramm gestartet.");
+                bool continueProgram = true;
+                while (continueProgram)
+                {
+                    continueProgram = mainmenu();
+                }
             }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                Console.ReadKey();
+            }
+            
         }
 
         private static void GenerateRandomList()
         {
-            LinkedList linkedList = new LinkedList();
+            Console.WriteLine(String.Format("Zur zufälligen Generierung von Studenten stehen derzeit {0} Vornamen, {1} Nachnamen und {2} Studiengänge zur Auswahl.", vornamen.Count, nachnamen.Count, studiengaenge.Count));
+            Console.WriteLine("Wieviele zufällige Studenten sollen generiert und hinzugefügt werden?");
+            int anzahl = InputNumber(0, Int32.MaxValue);
             Random rnd = new Random();
             //int id = rnd.Next(73628, 78329);
             int id = 0;
-            for (int i = 0; i <= rnd.Next(10, 101); i++)
+            for (int i = 0; i < anzahl; i++)
             {
                 id = rnd.Next(73628, 78329);
                 string vorname = vornamen[rnd.Next(0, vornamen.Count)];
@@ -161,14 +173,14 @@ namespace StudentenListe
 
                 if (i == 0)
                 {
-                    if (!linkedList.AddFirst(sn))
+                    if (!studentLinkedList.AddFirst(sn))
                     {
                         Console.WriteLine("Kopf hinzufügen fehlgeschlagen!");
                     }
                 }
                 else
                 {
-                    if (!linkedList.AddLast(sn))
+                    if (!studentLinkedList.AddLast(sn))
                     {
                         Console.WriteLine("Element hinzufügen fehlgeschlagen!");
                         Console.WriteLine(sn.Student.ToString());
@@ -178,15 +190,17 @@ namespace StudentenListe
                 //id++;
             }
 
-            linkedList.OutputAll();
-            Console.WriteLine("------------------------------");
+            Console.WriteLine("Liste nach der zufälligem Generierung von Studenten: ");
+            studentLinkedList.OutputAll(false);
         }
 
         private static bool mainmenu()
         {
-            Console.WriteLine("Programmauswahl: ");
+            Console.WriteLine("------Programmauswahl------");
             Console.WriteLine("(0) Programm beenden");
             Console.WriteLine("(1) Studenten hinzufügen");
+            Console.WriteLine("(2) Zufällige Studenten generieren und hinzufügen (für Testzwecke geeignet)");
+            int maxZahl = 2;
 
             if (studentLinkedList == null)
             {
@@ -195,28 +209,152 @@ namespace StudentenListe
 
             if(studentLinkedList.Count > 0)
             {
-                Console.WriteLine("(2) Studenten löschen");
-                Console.WriteLine("(3) Studenten suchen");
-                Console.WriteLine("(4) Liste sortieren");
-                Console.WriteLine("(5) Liste ausgeben");
-                Console.WriteLine("(6) Liste löschen");
-                Console.WriteLine("(7) Anzahl Elemente ausgeben");
+                Console.WriteLine("(3) Studenten löschen");
+                Console.WriteLine("(4) Studenten suchen");
+                Console.WriteLine("(5) Liste sortieren");
+                Console.WriteLine("(6) Liste ausgeben");
+                Console.WriteLine("(7) Liste löschen");
+                Console.WriteLine("(8) Anzahl Elemente ausgeben");
+                Console.WriteLine("(9) Element einer gewissen Stelle ausgeben");
+                maxZahl = 9;
             }
 
-            int operation = Int32.Parse(Console.ReadLine());
+            int operation = InputNumber(0, maxZahl);
 
             if (operation == 0)
                 return false;
+
             if (operation == 1)
                 AddStudentToList();
 
+            if(operation == 2)
+                GenerateRandomList();
+
             if (studentLinkedList.Count > 0)
-            { 
-                if(operation == 5)
-                    studentLinkedList.OutputAll();
+            {
+                if (operation == 3)
+                    DeleteStudent();
+
+                if (operation == 4)
+                    SearchStudent();
+
+                if (operation == 5)
+                    SortList();
+
+                if(operation == 6)
+                    studentLinkedList.OutputAll(true);
+
+                if (operation == 7)
+                    DeleteList();
+
+                if (operation == 8)
+                    studentLinkedList.OutputCount();
+
+                if (operation == 9)
+                    GetStudentAt();
             }
 
             return true;
+        }
+
+        private static void GetStudentAt()
+        {
+            Console.WriteLine("Den wievielten Studenten der Liste wollen Sie ausgeben?");
+            int index = InputNumber(1, Int32.MaxValue) - 1;
+            LinkedStudentNode element = studentLinkedList.ElementAt(index);
+
+            if (element != null)
+            {
+                Console.WriteLine("Folgender Student wurde gefunden: ");
+                Console.WriteLine(element.Student);
+            }
+            else
+            {
+                Console.WriteLine("Es konnte kein Student gefunden werden.");
+            }
+        }
+
+        private static void DeleteList()
+        {
+            Console.WriteLine("Wollen Sie die Liste wirklich löschen? (Y/N)");
+            string yesno = Console.ReadLine();
+
+            if (yesno.ToLower() == "y")
+            {
+                if (studentLinkedList.DeleteAll())
+                {
+                    Console.WriteLine("Liste erfolgreich gelöscht.");
+                }
+                else
+                {
+                    Console.WriteLine("Fehler beim Löschen der Liste.");
+                }
+            }
+        }
+
+        private static void SortList()
+        {
+            Console.WriteLine("Sie können die Studenten nach folgenden Kriterien sortieren:");
+            Console.WriteLine("(1) Matrikelnummer");
+            Console.WriteLine("(2) Studiengang");
+
+            Console.WriteLine("Wonach wollen Sie sortieren?");
+            int sortMode = InputNumber(1, 2);
+
+            LinkedList.SortMode sm = (LinkedList.SortMode) sortMode - 1;
+            studentLinkedList.SelectionSortList(sm);
+            studentLinkedList.OutputAll(false);
+        }
+
+        private static void SearchStudent()
+        {
+            Console.WriteLine("Sie können nach folgenden Kriterien suchen: ");
+            Console.WriteLine("(1) Vorname ");
+            Console.WriteLine("(2) Nachname ");
+            Console.WriteLine("(3) Vor- und Nachname");
+            Console.WriteLine("(4) Matrikelnummer");
+            Console.WriteLine("(5) Studiengang");
+            Console.WriteLine("Wonach wollen Sie suchen?");
+            int operation = InputNumber(1, 5);
+            int anzParameter = (operation == 3 ? 2 : 1);
+            string[] suchwerte = new string[anzParameter];
+
+            if (anzParameter == 1)
+            {
+                Console.WriteLine("Geben Sie den Suchwert ein: ");
+            }
+            else
+            {
+                Console.WriteLine("Geben Sie die Suchwerte ein: ");
+            }
+
+            for (int i = 0; i < anzParameter; i++)
+            {
+                suchwerte[i] = Console.ReadLine();
+            }
+            LinkedList.SearchMode sm = (LinkedList.SearchMode) operation - 1;
+            List<Student> studentsFound = studentLinkedList.SearchForStudent(sm, suchwerte);
+
+            if (studentsFound.Count > 0)
+            {
+                Console.WriteLine("Folgende Studenten wurden gefunden: ");
+                studentsFound.ForEach(x => Console.WriteLine(x));
+            }
+            else
+            {
+                Console.WriteLine("Es wurde kein Student gefunden, der den Suchkriterien und -werten entspricht.");
+            }
+        }
+
+        private static void DeleteStudent()
+        {
+            studentLinkedList.OutputAll(true);
+            Console.WriteLine("Geben Sie die Indexzahl des zu löschenden Studenten an: ");
+            int index = InputNumber(0, Int32.MaxValue);
+            if (!studentLinkedList.DeleteAt(index))
+            {
+                Console.WriteLine("Fehler beim Löschen des Studenten.");
+            }
         }
 
         private static void AddStudentToList()
@@ -229,16 +367,17 @@ namespace StudentenListe
             string nachname = Console.ReadLine();
 
             Console.WriteLine("Matrikelnummer: ");
-            string matrikelnummer = Console.ReadLine();
+            int matrikelnummer = InputNumber(0, Int32.MaxValue);
+
 
             Console.WriteLine("Studiengang: ");
             string studiengang = Console.ReadLine();
 
-            Student neuerStudent = new Student(nachname, vorname, Int32.Parse(matrikelnummer), studiengang);
+            Student neuerStudent = new Student(nachname, vorname, matrikelnummer, studiengang);
 
             Console.WriteLine("Wollen Sie den Studenten am Anfang oder am Ende hinzufügen?");
             Console.WriteLine("(1) Anfang, (2) Ende");
-            int operation = Int32.Parse(Console.ReadLine());
+            int operation = InputNumber(1, 2);
 
             if (operation == 1)
             {
@@ -256,6 +395,25 @@ namespace StudentenListe
             }
 
 
+        }
+
+        private static int InputNumber(int min, int max)
+        {
+            int zahl;
+            while (true)
+            {
+                string eingabe = Console.ReadLine();
+
+                if (Int32.TryParse(eingabe, out zahl))
+                {
+                    if (zahl >= min && zahl <= max)
+                    {
+                        break;
+                    }
+                }
+                Console.WriteLine("Es wurde eine ungültige Zahl eingegeben. Versuchen Sie es erneut.");
+            }
+            return zahl;
         }
     }
 }
