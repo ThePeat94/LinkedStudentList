@@ -8,18 +8,27 @@ namespace StudentenListe.src
 {
     class DoubleLinkedStudentNode
     {
+        /// <summary>
+        /// Der zu speicherende Datensatz
+        /// </summary>
         public Student Student
         {
             get { return student; }
             set { student = value; }
         }
 
+        /// <summary>
+        /// Der nachfolgende Knoten
+        /// </summary>
         public DoubleLinkedStudentNode Nachfolger
         {
             get { return nachfolger; }
             set { nachfolger = value; }
         }
 
+        /// <summary>
+        /// Der vorhergehende Knoten
+        /// </summary>
         public DoubleLinkedStudentNode Vorgaenger
         {
             get { return vorgaenger; }

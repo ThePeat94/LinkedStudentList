@@ -7,14 +7,23 @@ using System.Threading.Tasks;
 
 namespace StudentenListe.src
 {
+    /// <summary>
+    /// Diese Klasse stellt einen Knoten in einer verketteten Liste dar.
+    /// </summary>
     class LinkedStudentNode
     {
+        /// <summary>
+        /// Der enthaltene Nettodatensatz.
+        /// </summary>
         public Student Student
         {
             get { return student; }
             set { student = value; }
         }
 
+        /// <summary>
+        /// Der darauffolgende Datensatz
+        /// </summary>
         public LinkedStudentNode Nachfolger
         {
             get { return nachfolger; }
@@ -24,6 +33,11 @@ namespace StudentenListe.src
         private Student student;
         private LinkedStudentNode nachfolger;
 
+
+        /// <summary>
+        /// Erstellt einen neuen Knoten.
+        /// </summary>
+        /// <param name="student">Der Datensatz, der beinhaltet wird.</param>
         public LinkedStudentNode(Student student)
         {
             this.student = student;

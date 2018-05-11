@@ -10,6 +10,7 @@ namespace StudentenListe
 {
     class Program
     {
+        #region Listen für zufällige Studenten
         static List<string> vornamen = new List<string>
         {
             "Sonya",
@@ -131,6 +132,7 @@ namespace StudentenListe
             "Maschinenbau",
             "Geschichte"
         };
+        #endregion
 
         private static LinkedList studentLinkedList;
 
@@ -153,6 +155,9 @@ namespace StudentenListe
             
         }
 
+        /// <summary>
+        /// Generiert eine zufällige Anzahl an Studenten, welche der Liste hinzugefügt werden
+        /// </summary>
         private static void GenerateRandomList()
         {
             Console.WriteLine(String.Format("Zur zufälligen Generierung von Studenten stehen derzeit {0} Vornamen, {1} Nachnamen und {2} Studiengänge zur Auswahl.", vornamen.Count, nachnamen.Count, studiengaenge.Count));
@@ -171,29 +176,24 @@ namespace StudentenListe
                 Student neuerStudent = new Student(nachname, vorname, id, studiengang);
                 LinkedStudentNode sn = new LinkedStudentNode(neuerStudent);
 
-                if (i == 0)
+                if (!studentLinkedList.AddLast(sn))
                 {
-                    if (!studentLinkedList.AddFirst(sn))
-                    {
-                        Console.WriteLine("Kopf hinzufügen fehlgeschlagen!");
-                    }
+                    Console.WriteLine("Element hinzufügen fehlgeschlagen!");
+                    Console.WriteLine(sn.Student.ToString());
                 }
-                else
-                {
-                    if (!studentLinkedList.AddLast(sn))
-                    {
-                        Console.WriteLine("Element hinzufügen fehlgeschlagen!");
-                        Console.WriteLine(sn.Student.ToString());
-                    }
-                }
+
 
                 //id++;
             }
 
             Console.WriteLine("Liste nach der zufälligem Generierung von Studenten: ");
-            studentLinkedList.OutputAll(false);
+            studentLinkedList.OutputAll(true);
         }
 
+        /// <summary>
+        /// Das Hauptmenü
+        /// </summary>
+        /// <returns>true, wenn das Programm fortgesetzt werden soll, false wenn nicht</returns>
         private static bool mainmenu()
         {
             Console.WriteLine("------Programmauswahl------");
@@ -257,9 +257,13 @@ namespace StudentenListe
             return true;
         }
 
+        /// <summary>
+        /// Menü zur Auswahl eines Studenten anhand eines Index
+        /// </summary>
         private static void GetStudentAt()
         {
             Console.WriteLine("Den wievielten Studenten der Liste wollen Sie ausgeben?");
+            // minus 1, weil 0 basiert
             int index = InputNumber(1, Int32.MaxValue) - 1;
             LinkedStudentNode element = studentLinkedList.ElementAt(index);
 
@@ -274,6 +278,9 @@ namespace StudentenListe
             }
         }
 
+        /// <summary>
+        /// Menü zum Löschen der Liste
+        /// </summary>
         private static void DeleteList()
         {
             Console.WriteLine("Wollen Sie die Liste wirklich löschen? (Y/N)");
@@ -292,6 +299,9 @@ namespace StudentenListe
             }
         }
 
+        /// <summary>
+        /// Menü zum Sortieren der Liste
+        /// </summary>
         private static void SortList()
         {
             Console.WriteLine("Sie können die Studenten nach folgenden Kriterien sortieren:");
@@ -301,11 +311,15 @@ namespace StudentenListe
             Console.WriteLine("Wonach wollen Sie sortieren?");
             int sortMode = InputNumber(1, 2);
 
+            // minus 1, weil 0 basiert
             LinkedList.SortMode sm = (LinkedList.SortMode) sortMode - 1;
             studentLinkedList.SelectionSortList(sm);
             studentLinkedList.OutputAll(false);
         }
 
+        /// <summary>
+        /// Menü zur Suche nach einem Studenten
+        /// </summary>
         private static void SearchStudent()
         {
             Console.WriteLine("Sie können nach folgenden Kriterien suchen: ");
@@ -332,6 +346,8 @@ namespace StudentenListe
             {
                 suchwerte[i] = Console.ReadLine();
             }
+
+            // minus 1, weil 0 basiert
             LinkedList.SearchMode sm = (LinkedList.SearchMode) operation - 1;
             List<Student> studentsFound = studentLinkedList.SearchForStudent(sm, suchwerte);
 
@@ -346,6 +362,9 @@ namespace StudentenListe
             }
         }
 
+        /// <summary>
+        /// Menü zum Löschen eines Studenten anhand seines Index in der Liste
+        /// </summary>
         private static void DeleteStudent()
         {
             studentLinkedList.OutputAll(true);
@@ -357,6 +376,9 @@ namespace StudentenListe
             }
         }
 
+        /// <summary>
+        /// Menü zum Hinzufügen eines Studenten
+        /// </summary>
         private static void AddStudentToList()
         {
             Console.WriteLine("Sie wollen einen Studenten hinzufügen. Ein Student besteht aus Vorname, Nachname, Matrikelnummer und dem Studiengang.");
@@ -394,9 +416,15 @@ namespace StudentenListe
                 }
             }
 
-
+            studentLinkedList.OutputAll(false);
         }
 
+        /// <summary>
+        /// Versucht, solange eine Eingabe einzulesen, bis eine Zahl korrekt eingegeben wurde, welche zwischen einem Minimum und Maximum liegt
+        /// </summary>
+        /// <param name="min">Das Minimum</param>
+        /// <param name="max">Das Maximum</param>
+        /// <returns>Die eingelesene Zahl</returns>
         private static int InputNumber(int min, int max)
         {
             int zahl;
