@@ -264,7 +264,7 @@ namespace StudentenListe
         {
             Console.WriteLine("Den wievielten Studenten der Liste wollen Sie ausgeben?");
             // minus 1, weil 0 basiert
-            int index = InputNumber(1, Int32.MaxValue) - 1;
+            int index = InputNumber(1, studentLinkedList.Count) - 1;
             LinkedStudentNode element = studentLinkedList.ElementAt(index);
 
             if (element != null)
@@ -369,7 +369,7 @@ namespace StudentenListe
         {
             studentLinkedList.OutputAll(true);
             Console.WriteLine("Geben Sie die Indexzahl des zu löschenden Studenten an: ");
-            int index = InputNumber(0, Int32.MaxValue);
+            int index = InputNumber(1, studentLinkedList.Count) - 1;
             if (!studentLinkedList.DeleteAt(index))
             {
                 Console.WriteLine("Fehler beim Löschen des Studenten.");

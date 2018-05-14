@@ -142,7 +142,7 @@ namespace StudentenListe.src
             if (ValidityCheck())
             {
                 LinkedStudentNode current = head;
-                int index = 0;
+                int index = 1;
                 // Solange ein Nachfolger existiert, gibt es noch einen Studenten zur Darstellung
                 while (current != null)
                 {
@@ -285,41 +285,47 @@ namespace StudentenListe.src
         {
             if (ValidityCheck())
             {
+                // Wenn die Liste nur ein Element beinhaltet, muss nicht sortiert werden
+                if (count == 1)
+                    return;
+
+                LinkedStudentNode aktuellesElement = head;
                 for (int i = 0; i < count; i++)
                 {
-                    // Der Index mit dem aktuell kleinsten Element
-                    int currMin = i;
+                    // Da immer das nachfolgende Element betrachtet wird, holen wir uns den Nachfolger
+                    // Erst den Nachfolger holen, wenn es zuvor einen Durchgang gab
+                    if(i > 0)
+                        aktuellesElement = aktuellesElement.Nachfolger;
+
+                    LinkedStudentNode aktuellKleinstesElement = aktuellesElement;
+
+                    LinkedStudentNode vergleichendesElement = aktuellesElement.Nachfolger;
+
                     for (int j = i + 1; j < count; j++)
                     {
-                        
-                        LinkedStudentNode minElement = ElementAt(currMin);
-
-                        // Der zu vergleichende Knoten
-                        LinkedStudentNode jElement = ElementAt(j);
-
                         if (sortMode == SortMode.MATRIKELNUMMER)
                         {
                             // Wenn das Element an der aktuellen kleinsten Stelle größer ist als das jElement, so ist jElement das kleinste Element
-                            if (minElement.Student.Matrikelnummer > jElement.Student.Matrikelnummer)
+                            if (aktuellKleinstesElement.Student.Matrikelnummer > vergleichendesElement.Student.Matrikelnummer)
                             {
-                                currMin = j;
+                                aktuellKleinstesElement = vergleichendesElement;
                             }
                         }
                         else if (sortMode == SortMode.STUDIENGANG)
                         {
                             // minElements Studiengang ist alphabetisch nach jElements Studiengang
-                            if (String.Compare(minElement.Student.Studiengang, jElement.Student.Studiengang, StringComparison.OrdinalIgnoreCase) > 0)
+                            if (String.Compare(aktuellKleinstesElement.Student.Studiengang, vergleichendesElement.Student.Studiengang, StringComparison.OrdinalIgnoreCase) > 0)
                             {
-                                currMin = j;
+                                aktuellKleinstesElement = vergleichendesElement;
                             }
                         }
-
+                        // Anschließend das nächste Element
+                        vergleichendesElement = vergleichendesElement.Nachfolger;
                     }
-
                     // Tauschen
-                    Student toSwap = ElementAt(currMin).Student;
-                    ElementAt(currMin).Student = ElementAt(i).Student;
-                    ElementAt(i).Student = toSwap;
+                    Student toSwap = aktuellKleinstesElement.Student;
+                    aktuellKleinstesElement.Student = aktuellesElement.Student;
+                    aktuellesElement.Student = toSwap;
                 }
             }
         }
@@ -330,38 +336,48 @@ namespace StudentenListe.src
         /// <param name="sortMode">Der Sortiermodus bestimmt ob nach Matrikelnummer oder Studiengang sortiert werden soll</param>
         public void InsertionSort(SortMode sortMode)
         {
-            // Erste Element ist bereits sortiert ("Linker Teil")
-            for (int i = 1; i < count; i++)
+            // Wenn die Liste nur ein Element beinhaltet, muss nicht sortiert werden
+            if (count == 1)
+                return;
+
+            if (ValidityCheck())
             {
-                Student einzusortierendeElement = ElementAt(i).Student;
+                LinkedStudentNode zuSortierenderKnoten = head;
 
-                int idLinks = i;
-
-                if (sortMode == SortMode.MATRIKELNUMMER)
+                // Erste Element ist bereits sortiert ("Linker Teil")
+                for (int i = 1; i < count; i++) // n - 1
                 {
-                    // Von rechts nach links laufen und alle größeren Elemente im "linken Teil" nach rechts verschieben
-                    while (idLinks > 0 && einzusortierendeElement.Matrikelnummer < ElementAt(idLinks - 1).Student.Matrikelnummer)
+                    zuSortierenderKnoten = zuSortierenderKnoten.Nachfolger;
+                    Student einzusortierendeElement = zuSortierenderKnoten.Student;
+
+                    int idLinks = i;
+
+                    if (sortMode == SortMode.MATRIKELNUMMER)
                     {
-                        // Das Element links einen nach rechts verschieben
-                        ElementAt(idLinks).Student = ElementAt(idLinks - 1).Student;
-                        idLinks--;
+                        // Von rechts nach links laufen und alle größeren Elemente im "linken Teil" nach rechts verschieben
+                        while (idLinks > 0 && einzusortierendeElement.Matrikelnummer < ElementAt(idLinks - 1).Student.Matrikelnummer)
+                        {
+                            // Das Element links einen nach rechts verschieben
+                            ElementAt(idLinks).Student = ElementAt(idLinks - 1).Student;
+                            idLinks--;
+                        }
                     }
-                }
-                else if (sortMode == SortMode.STUDIENGANG)
-                {
-                    // Von rechts nach links laufen und alle größeren Elemente im "linken Teil" nach rechts verschieben
-                    while (idLinks > 0 && String.Compare(einzusortierendeElement.Studiengang, ElementAt(idLinks - 1).Student.Studiengang, StringComparison.OrdinalIgnoreCase) < 0)
+                    else if (sortMode == SortMode.STUDIENGANG)
                     {
-                        // Das Element links einen nach rechts verschieben
-                        ElementAt(idLinks).Student = ElementAt(idLinks - 1).Student;
-                        idLinks--;
+                        // Von rechts nach links laufen und alle größeren Elemente im "linken Teil" nach rechts verschieben
+                        while (idLinks > 0 && String.Compare(einzusortierendeElement.Studiengang, ElementAt(idLinks - 1).Student.Studiengang, StringComparison.OrdinalIgnoreCase) < 0)
+                        {
+                            // Das Element links einen nach rechts verschieben
+                            ElementAt(idLinks).Student = ElementAt(idLinks - 1).Student;
+                            idLinks--;
+                        }
                     }
+
+
+                    // Nach der while-Schleife wissen wir, wo unser aktuelles Element eingeordnet werden muss
+                    ElementAt(idLinks).Student = einzusortierendeElement;
+
                 }
-
-
-                // Nach der while-Schleife wissen wir, wo unser aktuelles Element eingeordnet werden muss
-                ElementAt(idLinks).Student = einzusortierendeElement;
-
             }
         }
            
