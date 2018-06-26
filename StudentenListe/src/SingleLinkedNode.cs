@@ -10,37 +10,37 @@ namespace StudentenListe.src
     /// <summary>
     /// Diese Klasse stellt einen Knoten in einer verketteten Liste dar.
     /// </summary>
-    class LinkedStudentNode
+    class SingleLinkedNode<T>
     {
         /// <summary>
         /// Der enthaltene Nettodatensatz.
         /// </summary>
-        public Student Student
+        public T Data
         {
-            get { return student; }
-            set { student = value; }
+            get { return _data; }
+            set { _data = value; }
         }
 
         /// <summary>
         /// Der darauffolgende Datensatz
         /// </summary>
-        public LinkedStudentNode Nachfolger
+        public SingleLinkedNode<T> Nachfolger
         {
             get { return nachfolger; }
             set { nachfolger = value; }
         }
 
-        private Student student;
-        private LinkedStudentNode nachfolger;
+        private T _data;
+        private SingleLinkedNode<T> nachfolger;
 
 
         /// <summary>
         /// Erstellt einen neuen Knoten.
         /// </summary>
-        /// <param name="student">Der Datensatz, der beinhaltet wird.</param>
-        public LinkedStudentNode(Student student)
+        /// <param name="data">Der Datensatz, der beinhaltet wird.</param>
+        public SingleLinkedNode(T data)
         {
-            this.student = student;
+            this._data = data;
         }
     }
 }

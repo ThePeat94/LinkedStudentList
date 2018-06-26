@@ -134,7 +134,7 @@ namespace StudentenListe
         };
         #endregion
 
-        private static LinkedList studentLinkedList;
+        private static SingleLinkedList<Student> studentLinkedList;
 
         static void Main(string[] args)
         {
@@ -174,12 +174,12 @@ namespace StudentenListe
                 string studiengang = studiengaenge[rnd.Next(0, studiengaenge.Count)];
 
                 Student neuerStudent = new Student(nachname, vorname, id, studiengang);
-                LinkedStudentNode sn = new LinkedStudentNode(neuerStudent);
+                SingleLinkedNode<Student> sn = new SingleLinkedNode<Student>(neuerStudent);
 
                 if (!studentLinkedList.AddLast(sn))
                 {
                     Console.WriteLine("Element hinzufügen fehlgeschlagen!");
-                    Console.WriteLine(sn.Student.ToString());
+                    Console.WriteLine(sn.Data.ToString());
                 }
 
 
@@ -204,7 +204,7 @@ namespace StudentenListe
 
             if (studentLinkedList == null)
             {
-                studentLinkedList = new LinkedList();
+                studentLinkedList = new SingleLinkedList<Student>();
             }
 
             if(studentLinkedList.Count > 0)
@@ -265,16 +265,16 @@ namespace StudentenListe
             Console.WriteLine("Den wievielten Studenten der Liste wollen Sie ausgeben?");
             // minus 1, weil 0 basiert
             int index = InputNumber(1, studentLinkedList.Count) - 1;
-            LinkedStudentNode element = studentLinkedList.ElementAt(index);
+            SingleLinkedNode<Student> element = studentLinkedList.ElementAt(index);
 
             if (element != null)
             {
-                Console.WriteLine("Folgender Student wurde gefunden: ");
-                Console.WriteLine(element.Student);
+                Console.WriteLine("Folgender Data wurde gefunden: ");
+                Console.WriteLine(element.Data);
             }
             else
             {
-                Console.WriteLine("Es konnte kein Student gefunden werden.");
+                Console.WriteLine("Es konnte kein Data gefunden werden.");
             }
         }
 
@@ -312,8 +312,8 @@ namespace StudentenListe
             int sortMode = InputNumber(1, 2);
 
             // minus 1, weil 0 basiert
-            LinkedList.SortMode sm = (LinkedList.SortMode) sortMode - 1;
-            studentLinkedList.SelectionSortList(sm);
+            StudentUtils.SortMode sm = (StudentUtils.SortMode) sortMode - 1;
+            StudentUtils.SelectionSortList(studentLinkedList, sm);
             studentLinkedList.OutputAll(false);
         }
 
@@ -348,8 +348,8 @@ namespace StudentenListe
             }
 
             // minus 1, weil 0 basiert
-            LinkedList.SearchMode sm = (LinkedList.SearchMode) operation - 1;
-            List<Student> studentsFound = studentLinkedList.SearchForStudent(sm, suchwerte);
+            StudentUtils.SearchMode sm = (StudentUtils.SearchMode) operation - 1;
+            List<Student> studentsFound = StudentUtils.SearchForStudent(studentLinkedList, sm, suchwerte);
 
             if (studentsFound.Count > 0)
             {
@@ -358,7 +358,7 @@ namespace StudentenListe
             }
             else
             {
-                Console.WriteLine("Es wurde kein Student gefunden, der den Suchkriterien und -werten entspricht.");
+                Console.WriteLine("Es wurde kein Data gefunden, der den Suchkriterien und -werten entspricht.");
             }
         }
 
@@ -381,7 +381,7 @@ namespace StudentenListe
         /// </summary>
         private static void AddStudentToList()
         {
-            Console.WriteLine("Sie wollen einen Studenten hinzufügen. Ein Student besteht aus Vorname, Nachname, Matrikelnummer und dem Studiengang.");
+            Console.WriteLine("Sie wollen einen Studenten hinzufügen. Ein Data besteht aus Vorname, Nachname, Matrikelnummer und dem Studiengang.");
             Console.WriteLine("Vorname: ");
             string vorname = Console.ReadLine();
 
@@ -403,14 +403,14 @@ namespace StudentenListe
 
             if (operation == 1)
             {
-                if (!studentLinkedList.AddFirst(new LinkedStudentNode(neuerStudent)))
+                if (!studentLinkedList.AddFirst(new SingleLinkedNode<Student>(neuerStudent)))
                 {
                     Console.WriteLine("Fehler beim Hinzufügen des Studenten.");
                 }
             }
             else if (operation == 2)
             {
-                if (!studentLinkedList.AddLast(new LinkedStudentNode(neuerStudent)))
+                if (!studentLinkedList.AddLast(new SingleLinkedNode<Student>(neuerStudent)))
                 {
                     Console.WriteLine("Fehler beim Hinzufügen des Studenten.");
                 }

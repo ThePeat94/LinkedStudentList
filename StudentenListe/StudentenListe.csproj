@@ -46,9 +46,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="src\DoubleLinkedList.cs" />
     <Compile Include="src\DoubleLinkedStudentNode.cs" />
-    <Compile Include="src\LinkedList.cs" />
+    <Compile Include="src\SingleLinkedList.cs" />
     <Compile Include="src\Student.cs" />
-    <Compile Include="src\LinkedStudentNode.cs" />
+    <Compile Include="src\SingleLinkedNode.cs" />
+    <Compile Include="src\StudentUtils.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
